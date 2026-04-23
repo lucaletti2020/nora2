@@ -36,25 +36,40 @@ Ask **one question at a time**. Keep each question short so the user can answer 
 5. "Do you have any medical conditions that affect your diet — like diabetes, osteoporosis, IBS, or high cholesterol? If none, just say no."
 6. "Any food allergies or intolerances? (e.g. lactose, gluten, nuts, shellfish) If none, just say no."
 7. "How would you describe your diet? (e.g. omnivore, vegetarian, vegan, pescatarian)"
-8. "Do you have a daily calorie target in mind? If you do, great — tell me the number. If not, no stress, I'll work it out for you based on your profile."
-   → After receiving the calorie target (or noting that Nora will calculate it), pause before asking about food preferences. Instead:
+8. "What's your main health or nutrition goal? (e.g. lose weight, build muscle, eat more balanced, manage energy)"
+9. "Do you have a daily calorie target in mind? If you do, great — tell me the number. If not, no worries."
+   → If the user has a specific target: note it and proceed directly to Step 9a.
+   → If the user does not have a target: ask these two follow-up questions before calculating:
+     - "Do you do any sport or exercise?"
+     - If yes: "What sport or activity, and roughly how many days a week?"
+     Use the answers to assign an activity multiplier to the Mifflin-St Jeor BMR:
+     - No exercise: × 1.2
+     - 1–2 days/week: × 1.375
+     - 3–4 days/week: × 1.55
+     - 5–6 days/week: × 1.725
+     - Daily or twice daily: × 1.9
+     Then adjust the TDEE for goal:
+     - Lose weight: subtract 400 kcal
+     - Build muscle: add 250 kcal
+     - Maintain / eat more balanced / manage energy: no adjustment
+     Present the recommended calorie target with a one-line explanation (e.g. "Based on your stats, running 3 days a week, and your goal to lose weight, I'd put you at ~1,750 kcal/day — a moderate deficit."). Then proceed to Step 9a.
 
-   **Step 7a — Reveal personalised nutrient targets**
-   Calculate and display the user's daily targets based on what you know so far:
-   - **Calories**: apply Mifflin-St Jeor with sedentary multiplier (adjust later if activity level is given)
-   - **Protein**: use 0.8g/kg as default (adjust after goal is confirmed)
+   **Step 9a — Reveal personalised nutrient targets**
+   Calculate and display the user's daily targets using all information collected so far (weight, height, sex, age, activity level, goal):
+   - **Calories**: as determined above (user-provided or calculated with activity + goal adjustment)
+   - **Protein**: adjust by goal — lose weight: weight(kg) × 1.8 g · build muscle: weight(kg) × 2.0 g · other: weight(kg) × 1.6 g
    - **Fibre**: 30g/day (universal target)
    - **Calcium**: 1200mg/day (universal target for this skill)
 
    Present these in a clear, friendly summary. Example:
    *"Before we go further — here's what I'll be optimising your meal plan for, based on your profile:*
-   - 🔥 Calories: ~1,650 kcal/day
-   - 💪 Protein: ~46g/day (we'll refine this once I know your goal)
+   - 🔥 Calories: ~1,750 kcal/day
+   - 💪 Protein: ~108g/day
    - 🌿 Fibre: 30g/day
    - 🦴 Calcium: 1,200mg/day
    *These are based on leading nutritional guidelines (AHA, WHO, EFSA)."*
 
-   **Step 7b — Interactive food selection by nutrient**
+   **Step 9b — Interactive food selection by nutrient**
    Tell the user you'll now show foods that are rich in each nutrient, and ask them to tick the ones they're happy to eat. Show one nutrient group at a time. Keep the tone light.
 
    For each nutrient group, output a self-contained HTML block using ONLY this exact pattern — no JavaScript, no dynamic creation, no external styles. Use plain HTML checkboxes and a single Done button per group.
@@ -89,18 +104,17 @@ Ask **one question at a time**. Keep each question short so the user can answer 
 
    ⭐ = appears in multiple nutrient groups (double-duty food). After the user clicks Done for all three groups, confirm their picks and move on.
 
-   **Step 7c — Protein shake**
+   **Step 9c — Protein shake**
    After the protein food selection, ask: "One more thing — do you want me to include a protein shake in your plan? It adds an easy 24g of protein per serving. If yes, which days?" If yes, add it to those days and count 24g protein + ~120 kcal per serving.
-9. "Are there any foods you really dislike or want to avoid?"
-10. "Any foods you love or want to eat more of?"
-11. "Do you have a cuisine preference? (e.g. Mediterranean, Asian, Latin American) — or just say 'no preference'."
-12. "Would you like to include desserts in your plan? If yes, which days?"
-13. "Would you like to include alcohol? If yes, which days?"
+10. "Are there any foods you really dislike or want to avoid?"
+11. "Any foods you love or want to eat more of?"
+12. "Do you have a cuisine preference? (e.g. Mediterranean, Asian, Latin American) — or just say 'no preference'."
+13. "Would you like to include desserts in your plan? If yes, which days?"
+14. "Would you like to include alcohol? If yes, which days?"
     → If yes, follow up with two quick questions:
-    13a. "What drinks do you usually have?" (e.g. wine, beer, cocktails)
-    13b. "Roughly how many drinks on each of those days?"
+    14a. "What drinks do you usually have?" (e.g. wine, beer, cocktails)
+    14b. "Roughly how many drinks on each of those days?"
     Use the answers to estimate calories from alcohol and factor into the daily calorie budget for those days. Reference values: wine ~120 kcal/glass (150ml), beer ~150 kcal/pint, spirits ~70 kcal/shot, cocktail ~200 kcal.
-14. "What's your main health or nutrition goal? (e.g. lose weight, build muscle, eat more balanced, manage energy)"
 15. "Has a doctor or dietitian given you specific nutrient targets to hit? If yes, what are they?"
 16. "Do you prefer quick and simple meals, or are you happy to cook something more elaborate on some days?"
 
@@ -124,8 +138,8 @@ After completing the interview, calculate or estimate the user's daily nutrient 
 reference values.
 
 Key targets to establish per day:
-- **Calories**: If the user provided a target, use that. Otherwise, calculate using Mifflin-St Jeor BMR formula adjusted for activity level (default to sedentary if not given)
-- **Protein**: weight (kg) × 1.8 = min g/day · weight (kg) × 2.0 = max g/day. Present as a range; use the midpoint for planning.
+- **Calories**: Use the user-provided target if given. Otherwise use Mifflin-St Jeor BMR × activity multiplier (no exercise 1.2 · 1–2 days 1.375 · 3–4 days 1.55 · 5–6 days 1.725 · daily 1.9), then apply goal adjustment (lose weight −400 kcal · build muscle +250 kcal · other no change).
+- **Protein**: Adjust by goal — lose weight: weight(kg) × 1.8 g · build muscle: weight(kg) × 2.0 g · other: weight(kg) × 1.6 g.
 - **Calcium**: **1200 mg/day** — universal target for this skill
 - **Fibre**: **30 g/day** — AHA · WHO · EFSA consensus for adults, all sexes
 - **Fat & carbs**: fill remaining calories using standard macro splits (adjust for goal)
