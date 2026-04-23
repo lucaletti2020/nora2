@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String           @id @default(cuid())
+  email       String           @unique
+  name        String
+  password    String
+  createdAt   DateTime         @default(now())
+  preferences UserPreferences?
+  mealPlans   MealPlan[]
+}
+
+model UserPreferences {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  age               Int?
+  sex               String?
+  weightKg          Float?
+  heightCm          Float?
+  bmi               Float?
+  medicalConditions String?
+  allergies         String?
+  dietType          String?
+  calorieTarget     Int?
+  proteinTargetG    Int?
+  fibreTargetG      Int?
+  calciumTargetMg   Int?
+  dislikedFoods     String?
+  favoriteFoods     String?
+  cuisinePreference String?
+  goal              String?
+  updatedAt         DateTime @updatedAt
+}
+
+model MealPlan {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String   @default("Weekly Meal Plan")
+  content   String
+  createdAt DateTime @default(now())
+}
