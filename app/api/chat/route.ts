@@ -1,7 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { AzureOpenAI } from "openai";
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const client = new AzureOpenAI({
+  apiKey: process.env.AZURE_OPENAI_API_KEY,
+  endpoint: process.env.AZURE_OPENAI_ENDPOINT,
+  apiVersion: process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21",
+  deployment: process.env.AZURE_OPENAI_DEPLOYMENT,
 });
 
 const NORA_SYSTEM_PROMPT = `name: nora
@@ -210,10 +213,9 @@ Use ✅ for within 10% of target, ⚠️ for 10–20% below, ❌ for >20% below.
 - Always invite follow-up: "Want me to swap any meals, adjust portions, or add a shopping list?"`;
 
 export async function POST(req: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || apiKey === "your_api_key_here") {
+  if (!process.env.AZURE_OPENAI_API_KEY || !process.env.AZURE_OPENAI_ENDPOINT || !process.env.AZURE_OPENAI_DEPLOYMENT) {
     return Response.json(
-      { error: "ANTHROPIC_API_KEY is not configured. Add it to .env.local and restart the server." },
+      { error: "Azure OpenAI is not configured. Add AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT to your environment variables." },
       { status: 500 }
     );
   }
@@ -225,39 +227,31 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  let stream;
-  try {
-    stream = client.messages.stream({
-      model: "claude-sonnet-4-6",
-      max_tokens: 8096,
-      system: [
-        {
-          type: "text",
-          text: NORA_SYSTEM_PROMPT,
-          cache_control: { type: "ephemeral" },
-        },
-      ],
-      messages,
-    } as Parameters<typeof client.messages.stream>[0]);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to start stream";
-    return Response.json({ error: message }, { status: 500 });
-  }
-
   const encoder = new TextEncoder();
 
   const readable = new ReadableStream({
     async start(controller) {
       try {
+        const stream = await client.chat.completions.create({
+          model: process.env.AZURE_OPENAI_DEPLOYMENT!,
+          max_tokens: 8096,
+          messages: [
+            { role: "system", content: NORA_SYSTEM_PROMPT },
+            ...messages.map((m) => ({
+              role: m.role as "user" | "assistant",
+              content: m.content,
+            })),
+          ],
+          stream: true,
+        });
+
         for await (const chunk of stream) {
-          if (
-            chunk.type === "content_block_delta" &&
-            chunk.delta.type === "text_delta"
-          ) {
-            const data = JSON.stringify({ text: chunk.delta.text });
-            controller.enqueue(encoder.encode(`data: ${data}\n\n`));
+          const text = chunk.choices[0]?.delta?.content ?? "";
+          if (text) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
           }
         }
+
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       } catch (err) {

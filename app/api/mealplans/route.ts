@@ -1,9 +1,14 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { AzureOpenAI } from "openai";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new AzureOpenAI({
+  apiKey: process.env.AZURE_OPENAI_API_KEY,
+  endpoint: process.env.AZURE_OPENAI_ENDPOINT,
+  apiVersion: process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21",
+  deployment: process.env.AZURE_OPENAI_DEPLOYMENT,
+});
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -50,15 +55,19 @@ async function extractAndSavePreferences(
     .map((m) => `${m.role === "user" ? "User" : "Nora"}: ${m.content}`)
     .join("\n\n");
 
-  const response = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
+  const response = await client.chat.completions.create({
+    model: process.env.AZURE_OPENAI_DEPLOYMENT!,
     max_tokens: 512,
-    system:
-      'Extract user nutrition preferences from this chat. Return ONLY valid JSON with these fields (use null for unknown): {"age":number,"sex":string,"weightKg":number,"heightCm":number,"bmi":number,"medicalConditions":string,"allergies":string,"dietType":string,"calorieTarget":number,"proteinTargetG":number,"fibreTargetG":number,"calciumTargetMg":number,"dislikedFoods":string,"favoriteFoods":string,"cuisinePreference":string,"goal":string}',
-    messages: [{ role: "user", content: conversationText }],
+    messages: [
+      {
+        role: "system",
+        content: 'Extract user nutrition preferences from this chat. Return ONLY valid JSON with these fields (use null for unknown): {"age":number,"sex":string,"weightKg":number,"heightCm":number,"bmi":number,"medicalConditions":string,"allergies":string,"dietType":string,"calorieTarget":number,"proteinTargetG":number,"fibreTargetG":number,"calciumTargetMg":number,"dislikedFoods":string,"favoriteFoods":string,"cuisinePreference":string,"goal":string}',
+      },
+      { role: "user", content: conversationText },
+    ],
   });
 
-  const text = response.content[0].type === "text" ? response.content[0].text : "";
+  const text = response.choices[0]?.message?.content ?? "";
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) return;
 
