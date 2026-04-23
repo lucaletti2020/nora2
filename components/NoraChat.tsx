@@ -113,9 +113,11 @@ export default function NoraChat() {
       }
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
+      const detail = err instanceof Error ? err.message : "Unknown error";
+      console.error("[Nora chat error]", detail);
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: "Something went wrong on my end. Try again?",
+        content: `Something went wrong: ${detail}`,
       }]);
     } finally {
       setIsLoading(false);

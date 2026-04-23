@@ -3,12 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const client = new AzureOpenAI({
-  apiKey: process.env.AZURE_OPENAI_API_KEY,
-  endpoint: process.env.AZURE_OPENAI_ENDPOINT,
-  apiVersion: process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21",
-  deployment: process.env.AZURE_OPENAI_DEPLOYMENT,
-});
+function getClient() {
+  return new AzureOpenAI({
+    apiKey: process.env.AZURE_OPENAI_API_KEY,
+    endpoint: process.env.AZURE_OPENAI_ENDPOINT,
+    apiVersion: process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21",
+    deployment: process.env.AZURE_OPENAI_DEPLOYMENT,
+  });
+}
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -55,7 +57,7 @@ async function extractAndSavePreferences(
     .map((m) => `${m.role === "user" ? "User" : "Nora"}: ${m.content}`)
     .join("\n\n");
 
-  const response = await client.chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: process.env.AZURE_OPENAI_DEPLOYMENT!,
     max_tokens: 512,
     messages: [

@@ -1,12 +1,5 @@
 import { AzureOpenAI } from "openai";
 
-const client = new AzureOpenAI({
-  apiKey: process.env.AZURE_OPENAI_API_KEY,
-  endpoint: process.env.AZURE_OPENAI_ENDPOINT,
-  apiVersion: process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21",
-  deployment: process.env.AZURE_OPENAI_DEPLOYMENT,
-});
-
 const NORA_SYSTEM_PROMPT = `name: nora
 description: >
   Nora is a conversational nutrition agent that builds fully personalized weekly meal plans (3 meals + snacks/day).
@@ -213,12 +206,19 @@ Use ✅ for within 10% of target, ⚠️ for 10–20% below, ❌ for >20% below.
 - Always invite follow-up: "Want me to swap any meals, adjust portions, or add a shopping list?"`;
 
 export async function POST(req: Request) {
-  if (!process.env.AZURE_OPENAI_API_KEY || !process.env.AZURE_OPENAI_ENDPOINT || !process.env.AZURE_OPENAI_DEPLOYMENT) {
+  const apiKey = process.env.AZURE_OPENAI_API_KEY;
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;
+  const apiVersion = process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21";
+
+  if (!apiKey || !endpoint || !deployment) {
     return Response.json(
       { error: "Azure OpenAI is not configured. Add AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT to your environment variables." },
       { status: 500 }
     );
   }
+
+  const client = new AzureOpenAI({ apiKey, endpoint, apiVersion, deployment });
 
   let messages: { role: string; content: string }[];
   try {
@@ -256,6 +256,7 @@ export async function POST(req: Request) {
         controller.close();
       } catch (err) {
         const message = err instanceof Error ? err.message : "Stream error";
+        console.error("[Nora chat error]", err);
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: message })}\n\n`));
         controller.close();
       }
