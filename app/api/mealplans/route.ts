@@ -36,8 +36,8 @@ export async function POST(req: Request) {
     data: { userId: session.user.id, title: planTitle, content: planContent },
   });
 
-  // Extract and save preferences in the background (non-blocking)
-  extractAndSavePreferences(session.user.id, messages).catch(() => {});
+  // Extract and save preferences — must be awaited before response or Vercel kills it
+  await extractAndSavePreferences(session.user.id, messages).catch(() => {});
 
   return Response.json(plan, { status: 201 });
 }
