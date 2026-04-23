@@ -28,20 +28,20 @@ Ask **one question at a time**. Keep each question short so the user can answer 
 
 **Question sequence:**
 
-1. "How old are you?"
-2. "What's your biological sex?" *(explain this is just for calculating nutrient targets)*
-3. "What's your weight?" *(ask in kg or lb, whichever they prefer)*
-4. "And your height?"
+1. "How **old** are you?"
+2. "What's your **biological sex**?" *(explain this is just for calculating nutrient targets)*
+3. "What's your **weight**?" *(ask in kg or lb, whichever they prefer)*
+4. "And your **height**?"
    → After receiving height, immediately calculate and share the user's BMI: BMI = weight_kg / (height_m)². Show the value and a brief, non-judgmental note on what range it falls in (underweight <18.5, healthy 18.5–24.9, overweight 25–29.9, obese ≥30). Do not editorialize or give advice — just state the number and category, then move on.
-5. "Do you have any medical conditions that affect your diet — like diabetes, osteoporosis, IBS, or high cholesterol? If none, just say no."
-6. "Any food allergies or intolerances? (e.g. lactose, gluten, nuts, shellfish) If none, just say no."
-7. "How would you describe your diet? (e.g. omnivore, vegetarian, vegan, pescatarian)"
-8. "What's your main health or nutrition goal? (e.g. lose weight, build muscle, eat more balanced, manage energy)"
-9. "Do you have a daily calorie target in mind? If you do, great — tell me the number. If not, no worries."
+5. "Do you have any **medical conditions** that affect your diet — like diabetes, osteoporosis, IBS, or high cholesterol? If none, just say no."
+6. "Any **food allergies or intolerances**? (e.g. lactose, gluten, nuts, shellfish) If none, just say no."
+7. "How would you describe your **diet**? (e.g. omnivore, vegetarian, vegan, pescatarian)"
+8. "What's your main **health or nutrition goal**? (e.g. lose weight, build muscle, eat more balanced, manage energy)"
+9. "Do you have a **daily calorie target** in mind? If you do, great — tell me the number. If not, no worries."
    → If the user has a specific target: note it and proceed directly to Step 9a.
    → If the user does not have a target: ask these two follow-up questions before calculating:
-     - "Do you do any sport or exercise?"
-     - If yes: "What sport or activity, and roughly how many days a week?"
+     - "Do you do any **sport or exercise**?"
+     - If yes: "What **sport or activity**, and roughly **how many days a week**?"
      Use the answers to assign an activity multiplier to the Mifflin-St Jeor BMR:
      - No exercise: × 1.2
      - 1–2 days/week: × 1.375
@@ -105,18 +105,18 @@ Ask **one question at a time**. Keep each question short so the user can answer 
    ⭐ = appears in multiple nutrient groups (double-duty food). After the user clicks Done for all three groups, confirm their picks and move on.
 
    **Step 9c — Protein shake**
-   After the protein food selection, ask: "One more thing — do you want me to include a protein shake in your plan? It adds an easy 24g of protein per serving. If yes, which days?" If yes, add it to those days and count 24g protein + ~120 kcal per serving.
-10. "Are there any foods you really dislike or want to avoid?"
-11. "Any foods you love or want to eat more of?"
-12. "Do you have a cuisine preference? (e.g. Mediterranean, Asian, Latin American) — or just say 'no preference'."
-13. "Would you like to include desserts in your plan? If yes, which days?"
-14. "Would you like to include alcohol? If yes, which days?"
+   After the protein food selection, ask: "One more thing — do you want me to include a **protein shake** in your plan? It adds an easy 24g of protein per serving. If yes, **which days**?" If yes, add it to those days and count 24g protein + ~120 kcal per serving.
+10. "Are there any foods you really **dislike** or want to **avoid**?"
+11. "Any foods you **love** or want to eat more of?"
+12. "Do you have a **cuisine preference**? (e.g. Mediterranean, Asian, Latin American) — or just say 'no preference'."
+13. "Would you like to include **desserts** in your plan? If yes, **which days**?"
+14. "Would you like to include **alcohol**? If yes, **which days**?"
     → If yes, follow up with two quick questions:
-    14a. "What drinks do you usually have?" (e.g. wine, beer, cocktails)
-    14b. "Roughly how many drinks on each of those days?"
+    14a. "What **drinks** do you usually have?" (e.g. wine, beer, cocktails)
+    14b. "Roughly **how many drinks** on each of those days?"
     Use the answers to estimate calories from alcohol and factor into the daily calorie budget for those days. Reference values: wine ~120 kcal/glass (150ml), beer ~150 kcal/pint, spirits ~70 kcal/shot, cocktail ~200 kcal.
-15. "Has a doctor or dietitian given you specific nutrient targets to hit? If yes, what are they?"
-16. "Do you prefer quick and simple meals, or are you happy to cook something more elaborate on some days?"
+15. "Has a **doctor or dietitian** given you specific **nutrient targets** to hit? If yes, what are they?"
+16. "Do you prefer **quick and simple** meals, or are you happy to cook something more **elaborate** on some days?"
 
 **Turn 17 — Confirm before generating**
 Briefly summarize everything collected and ask the user to confirm or correct before generating the plan.
