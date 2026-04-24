@@ -66,15 +66,26 @@ function buildPDF(content: string, title: string): Promise<Buffer> {
 
       const numCols = Math.max(...rows.map((r) => r.length));
       const COL_W = PAGE_W / numCols;
-      const ROW_H = 16;
-      const PAD = 3;
+      const PAD = 5;
       const FONT_SIZE = 8;
+      const MIN_CONTENT_H = 10; // minimum cell content height
 
       rows.forEach((row, ri) => {
         const isHeader = ri === 0;
+        const font = isHeader ? "Helvetica-Bold" : "Helvetica";
+
+        // Measure the actual height needed for every cell in this row
+        const cellHeights = row.map((cell) =>
+          doc
+            .font(font)
+            .fontSize(FONT_SIZE)
+            .heightOfString(clean(cell), { width: COL_W - PAD * 2 })
+        );
+        const contentH = Math.max(MIN_CONTENT_H, ...cellHeights);
+        const rowH = contentH + PAD * 2;
 
         // Page break check
-        if (doc.y + ROW_H > doc.page.height - doc.page.margins.bottom - 10) {
+        if (doc.y + rowH > doc.page.height - doc.page.margins.bottom - 10) {
           doc.addPage();
         }
 
@@ -82,32 +93,31 @@ function buildPDF(content: string, title: string): Promise<Buffer> {
 
         // Row background
         doc.save()
-          .rect(ml, rowY, PAGE_W, ROW_H)
+          .rect(ml, rowY, PAGE_W, rowH)
           .fill(isHeader ? HEADER_BG : ri % 2 === 0 ? "#ffffff" : ROW_ALT)
           .restore();
 
-        // Cell borders (top line)
+        // Top border
         doc.save()
           .moveTo(ml, rowY).lineTo(ml + PAGE_W, rowY)
           .strokeColor(BORDER).lineWidth(0.5).stroke()
           .restore();
 
-        // Cell text
+        // Cell text — wrap enabled, no ellipsis
         row.forEach((cell, ci) => {
           const x = ml + ci * COL_W + PAD;
           doc
-            .font(isHeader ? "Helvetica-Bold" : "Helvetica")
+            .font(font)
             .fontSize(FONT_SIZE)
             .fillColor(BODY_TEXT)
             .text(clean(cell), x, rowY + PAD, {
               width: COL_W - PAD * 2,
-              lineBreak: false,
-              ellipsis: true,
+              lineBreak: true,
             });
         });
 
-        // Advance cursor to next row
-        doc.text("", ml, rowY + ROW_H);
+        // Advance cursor to start of next row
+        doc.text("", ml, rowY + rowH);
       });
 
       // Bottom border
