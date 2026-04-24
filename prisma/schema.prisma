@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id          String           @id @default(cuid())
-  email       String           @unique
-  name        String
-  password    String
-  createdAt   DateTime         @default(now())
-  preferences UserPreferences?
-  mealPlans   MealPlan[]
+  id                  String                @id @default(cuid())
+  email               String                @unique
+  name                String
+  password            String
+  createdAt           DateTime              @default(now())
+  preferences         UserPreferences?
+  mealPlans           MealPlan[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model UserPreferences {
@@ -46,5 +47,14 @@ model MealPlan {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String   @default("Weekly Meal Plan")
   content   String
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
   createdAt DateTime @default(now())
 }
