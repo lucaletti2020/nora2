@@ -5,7 +5,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Check, X } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Check, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PearIcon from "@/components/PearIcon";
 
@@ -207,6 +207,14 @@ export default function DashboardClient({ userName, initialPrefs, initialPlans }
                           <><ChevronDown className="w-3.5 h-3.5" /> View plan</>
                         )}
                       </button>
+                      <a
+                        href={`/api/mealplans/${plan.id}/pdf`}
+                        download
+                        className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground transition-smooth"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Download PDF
+                      </a>
                       <button
                         onClick={() => deletePlan(plan.id)}
                         disabled={deletingId === plan.id}

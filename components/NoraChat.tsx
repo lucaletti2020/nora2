@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { ArrowUp, LayoutDashboard, BookmarkCheck } from "lucide-react";
+import { ArrowUp, LayoutDashboard, BookmarkCheck, Download } from "lucide-react";
 import Link from "next/link";
 import NoraChatMessage from "./NoraChatMessage";
 import PearIcon from "./PearIcon";
@@ -27,6 +27,7 @@ export default function NoraChat() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [savingPlan, setSavingPlan] = useState(false);
   const [planSaved, setPlanSaved] = useState(false);
+  const [savedPlanId, setSavedPlanId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -143,11 +144,13 @@ export default function NoraChat() {
   const savePlan = useCallback(async () => {
     setSavingPlan(true);
     try {
-      await fetch("/api/mealplans", {
+      const res = await fetch("/api/mealplans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages }),
       });
+      const data = await res.json();
+      setSavedPlanId(data.id ?? null);
       setPlanSaved(true);
     } finally {
       setSavingPlan(false);
@@ -242,13 +245,25 @@ export default function NoraChat() {
             </p>
             <div className="flex items-center gap-2">
               {planSaved ? (
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-1.5 text-xs font-semibold px-4 py-1.5 rounded-full bg-primary text-white shadow-soft hover:opacity-90 transition-smooth"
-                >
-                  <BookmarkCheck className="w-3.5 h-3.5" />
-                  View in dashboard
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-1.5 text-xs font-semibold px-4 py-1.5 rounded-full bg-primary text-white shadow-soft hover:opacity-90 transition-smooth"
+                  >
+                    <BookmarkCheck className="w-3.5 h-3.5" />
+                    View in dashboard
+                  </Link>
+                  {savedPlanId && (
+                    <a
+                      href={`/api/mealplans/${savedPlanId}/pdf`}
+                      download
+                      className="flex items-center gap-1.5 text-xs font-semibold px-4 py-1.5 rounded-full border border-primary text-primary bg-white hover:bg-primary-soft transition-smooth"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Download PDF
+                    </a>
+                  )}
+                </>
               ) : (
                 <button
                   onClick={savePlan}
