@@ -15,10 +15,9 @@ export default function LandingPage() {
           </div>
           <span className="font-display text-xl font-semibold tracking-tight text-foreground">Nora</span>
         </a>
-        <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
+        <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground absolute left-1/2 -translate-x-1/2">
           <a href="#how" className="hover:text-foreground transition-smooth">How it works</a>
           <a href="#benefits" className="hover:text-foreground transition-smooth">Benefits</a>
-          <a href="#preview" className="hover:text-foreground transition-smooth">Preview</a>
         </nav>
         <Link href="/login">
           <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary-soft">Login</Button>
