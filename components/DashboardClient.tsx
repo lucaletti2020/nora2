@@ -160,13 +160,86 @@ export default function DashboardClient({ userName, initialPrefs, initialPlans }
           </p>
         </div>
 
+        {/* Meal plans */}
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="font-display text-xl font-semibold text-foreground">Your meal plans</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {plans.length === 0 ? "No plans saved yet." : `${plans.length} plan${plans.length === 1 ? "" : "s"} saved.`}
+              </p>
+            </div>
+            <Link href="/chat">
+              <Button size="sm" className="rounded-full bg-gradient-cta text-white shadow-soft hover:opacity-90 transition-smooth">
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Create new
+              </Button>
+            </Link>
+          </div>
+
+          {plans.length === 0 ? (
+            <div className="bg-card rounded-3xl border border-border shadow-soft p-12 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-primary-soft flex items-center justify-center mx-auto mb-4">
+                <PearIcon className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-foreground mb-2">No plans yet</h3>
+              <p className="text-sm text-muted-foreground">
+                Chat with Nora to generate your first weekly meal plan.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {plans.map((plan) => (
+                <div key={plan.id} className="bg-card rounded-3xl border border-border shadow-soft overflow-hidden">
+                  <div className="flex items-center justify-between px-6 py-4">
+                    <div>
+                      <h3 className="font-semibold text-foreground text-sm">{plan.title}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">{formatDate(plan.createdAt)}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setExpandedPlan(expandedPlan === plan.id ? null : plan.id)}
+                        className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground transition-smooth"
+                      >
+                        {expandedPlan === plan.id ? (
+                          <><ChevronUp className="w-3.5 h-3.5" /> Hide</>
+                        ) : (
+                          <><ChevronDown className="w-3.5 h-3.5" /> View plan</>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => deletePlan(plan.id)}
+                        disabled={deletingId === plan.id}
+                        className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50 transition-smooth disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        {deletingId === plan.id ? "Deleting…" : "Delete"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {expandedPlan === plan.id && (
+                    <div className="border-t border-border px-6 py-5 max-h-[600px] overflow-y-auto">
+                      <div className="markdown-content prose prose-sm max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {plan.content}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
         {/* Preferences */}
         <section className="bg-card rounded-3xl border border-border shadow-soft p-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="font-display text-xl font-semibold text-foreground">Your preferences</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {hasPrefs ? "Saved from your Nora conversation — edit anytime." : "Not set yet. Chat with Nora or fill in manually."}
+                {hasPrefs ? "Saved from your Nora conversation — edit anytime." : "Not set yet — they'll be saved automatically after your first chat."}
               </p>
             </div>
             {!editing && (
@@ -240,96 +313,31 @@ export default function DashboardClient({ userName, initialPrefs, initialPlans }
                 ))}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground text-sm mb-4">
-                Chat with Nora to get a personalised plan — your preferences will be saved automatically.
-              </p>
-              <Link href="/chat">
-                <Button className="rounded-full bg-gradient-cta text-white shadow-soft hover:opacity-90 transition-smooth">
-                  <Plus className="w-4 h-4 mr-1" />
-                  Chat with Nora
-                </Button>
-              </Link>
-            </div>
+            <p className="text-sm text-muted-foreground py-4">
+              No preferences saved yet. They'll appear here automatically after your first chat with Nora.
+            </p>
           )}
         </section>
 
-        {/* Meal plans */}
-        <section>
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h2 className="font-display text-xl font-semibold text-foreground">Your meal plans</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {plans.length === 0 ? "No plans saved yet." : `${plans.length} plan${plans.length === 1 ? "" : "s"} saved.`}
-              </p>
-            </div>
+        {/* Chat with Nora */}
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-cta px-8 py-12 text-center shadow-glow">
+          <div className="absolute inset-0 opacity-20 pointer-events-none">
+            <div className="absolute top-6 left-8 w-24 h-24 rounded-full bg-white/30 blur-3xl" />
+            <div className="absolute bottom-6 right-8 w-28 h-28 rounded-full bg-white/20 blur-3xl" />
+          </div>
+          <div className="relative">
+            <h2 className="font-display text-2xl md:text-3xl font-semibold text-primary-foreground">
+              Chat with Nora
+            </h2>
+            <p className="mt-2 text-primary-foreground/80 text-sm">
+              Get a new personalised weekly meal plan in minutes.
+            </p>
             <Link href="/chat">
-              <Button size="sm" className="rounded-full bg-gradient-cta text-white shadow-soft hover:opacity-90 transition-smooth">
-                <Plus className="w-3.5 h-3.5 mr-1" />
-                Create new
+              <Button size="lg" className="mt-6 rounded-full h-12 px-8 text-sm bg-background text-foreground hover:bg-background/90 shadow-card">
+                Start a new chat
               </Button>
             </Link>
           </div>
-
-          {plans.length === 0 ? (
-            <div className="bg-card rounded-3xl border border-border shadow-soft p-12 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-primary-soft flex items-center justify-center mx-auto mb-4">
-                <PearIcon className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="font-display text-lg font-semibold text-foreground mb-2">No plans yet</h3>
-              <p className="text-sm text-muted-foreground mb-6">
-                Chat with Nora to generate your first weekly meal plan.
-              </p>
-              <Link href="/chat">
-                <Button className="rounded-full bg-gradient-cta text-white shadow-soft hover:opacity-90 transition-smooth">
-                  Get my meal plan
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {plans.map((plan) => (
-                <div key={plan.id} className="bg-card rounded-3xl border border-border shadow-soft overflow-hidden">
-                  <div className="flex items-center justify-between px-6 py-4">
-                    <div>
-                      <h3 className="font-semibold text-foreground text-sm">{plan.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">{formatDate(plan.createdAt)}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setExpandedPlan(expandedPlan === plan.id ? null : plan.id)}
-                        className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground transition-smooth"
-                      >
-                        {expandedPlan === plan.id ? (
-                          <><ChevronUp className="w-3.5 h-3.5" /> Hide</>
-                        ) : (
-                          <><ChevronDown className="w-3.5 h-3.5" /> View plan</>
-                        )}
-                      </button>
-                      <button
-                        onClick={() => deletePlan(plan.id)}
-                        disabled={deletingId === plan.id}
-                        className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50 transition-smooth disabled:opacity-50"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        {deletingId === plan.id ? "Deleting…" : "Delete"}
-                      </button>
-                    </div>
-                  </div>
-
-                  {expandedPlan === plan.id && (
-                    <div className="border-t border-border px-6 py-5 max-h-[600px] overflow-y-auto">
-                      <div className="markdown-content prose prose-sm max-w-none">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {plan.content}
-                        </ReactMarkdown>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </section>
       </div>
     </div>
