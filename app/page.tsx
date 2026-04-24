@@ -21,7 +21,7 @@ export default function LandingPage() {
           <a href="#preview" className="hover:text-foreground transition-smooth">Preview</a>
         </nav>
         <Link href="/login">
-          <Button variant="default" size="sm">Login</Button>
+          <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary-soft">Login</Button>
         </Link>
       </header>
 
