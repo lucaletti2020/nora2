@@ -59,7 +59,7 @@ async function extractAndSavePreferences(
 
   const response = await getClient().chat.completions.create({
     model: process.env.AZURE_OPENAI_DEPLOYMENT!,
-    max_tokens: 512,
+    max_completion_tokens: 512,
     messages: [
       {
         role: "system",

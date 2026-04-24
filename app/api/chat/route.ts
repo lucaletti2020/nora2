@@ -234,7 +234,7 @@ export async function POST(req: Request) {
       try {
         const stream = await client.chat.completions.create({
           model: process.env.AZURE_OPENAI_DEPLOYMENT!,
-          max_tokens: 8096,
+          max_completion_tokens: 8096,
           messages: [
             { role: "system", content: NORA_SYSTEM_PROMPT },
             ...messages.map((m) => ({
