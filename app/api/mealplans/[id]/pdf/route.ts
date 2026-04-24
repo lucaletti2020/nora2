@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import PDFDocument from "pdfkit";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
