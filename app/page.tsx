@@ -210,6 +210,7 @@ export default function LandingPage() {
             Nora provides general nutrition guidance and is not a substitute for professional medical advice.
           </p>
           <div className="flex items-center gap-5 text-xs text-muted-foreground">
+            <span>© Sundae Education Technologies S.L</span>
             <Link href="/terms" className="hover:text-primary transition-smooth">Terms</Link>
             <Link href="/privacy" className="hover:text-primary transition-smooth">Privacy Policy</Link>
           </div>
