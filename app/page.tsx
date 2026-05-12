@@ -209,6 +209,10 @@ export default function LandingPage() {
           <p className="text-xs text-muted-foreground max-w-md text-center md:text-right leading-relaxed">
             Nora provides general nutrition guidance and is not a substitute for professional medical advice.
           </p>
+          <div className="flex items-center gap-5 text-xs text-muted-foreground">
+            <Link href="/terms" className="hover:text-primary transition-smooth">Terms</Link>
+            <Link href="/privacy" className="hover:text-primary transition-smooth">Privacy Policy</Link>
+          </div>
         </div>
       </footer>
     </div>

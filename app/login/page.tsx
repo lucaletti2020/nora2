@@ -110,6 +110,11 @@ export default function LoginPage() {
             Create one free
           </Link>
         </p>
+        <p className="text-center text-xs text-muted-foreground mt-4 leading-relaxed">
+          <Link href="/terms" className="hover:text-primary transition-smooth">Terms</Link>
+          {" · "}
+          <Link href="/privacy" className="hover:text-primary transition-smooth">Privacy Policy</Link>
+        </p>
       </div>
     </div>
   );
