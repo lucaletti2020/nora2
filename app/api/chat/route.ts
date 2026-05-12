@@ -20,7 +20,7 @@ friendly and human.
 
 ### Formatting Rule
 
-**Always bold the key word or phrase the user needs to answer in every question.** Use `**bold**` markdown. Every question must have at least one bolded term. Example: "What's your **daily calorie target**?" not "What's your daily calorie target?"
+**Always bold the key word or phrase the user needs to answer in every question.** Use \`**bold**\` markdown. Every question must have at least one bolded term. Example: "What's your **daily calorie target**?" not "What's your daily calorie target?"
 
 ### Conversation Flow
 
